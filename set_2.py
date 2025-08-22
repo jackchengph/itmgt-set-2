@@ -34,7 +34,13 @@ def shift_letter(letter, shift):
     '''
     # Replace `pass` with your code.
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-    pass
+    if letter == " ":
+        return " "
+    base = ord('A')
+    # normalize shift so very large/small shifts are handled
+    s = shift % 26
+    idx = ord(letter) - base
+    return chr(base + (idx + s) % 26)
 
 def caesar_cipher(message, shift):
     '''Caesar Cipher.
@@ -55,7 +61,7 @@ def caesar_cipher(message, shift):
     '''
     # Replace `pass` with your code.
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-    pass
+    return "".join(shift_letter(ch, shift) for ch in message)
 
 def shift_by_letter(letter, letter_shift):
     '''Shift By Letter.
@@ -84,7 +90,10 @@ def shift_by_letter(letter, letter_shift):
     '''
     # Replace `pass` with your code.
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-    pass
+    if letter == " ":
+        return " "
+    shift = ord(letter_shift) - ord('A')
+    return shift_letter(letter, shift)
 
 def vigenere_cipher(message, key):
     '''Vigenere Cipher.
@@ -116,7 +125,18 @@ def vigenere_cipher(message, key):
     '''
     # Replace `pass` with your code.
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-    pass
+    res = []
+    klen = len(key)
+    ki = 0  # index in key that advances only on letters
+    for ch in message:
+        if ch == " ":
+            res.append(" ")
+        else:
+            shift = ord(key[ki % klen]) - ord('A')
+            res.append(shift_letter(ch, shift))
+            ki += 1
+    return "".join(res)
+
 
 def scytale_cipher(message, shift):
     '''Scytale Cipher.
@@ -169,7 +189,23 @@ def scytale_cipher(message, shift):
     '''
     # Replace `pass` with your code.
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-    pass
+    if shift <= 0:
+        return message
+
+    L = len(message)
+    # pad with underscores so length is a multiple of shift
+    if L % shift != 0:
+        pad = shift - (L % shift)
+        message = message + "_" * pad
+        L += pad
+
+    cols = L // shift
+    # encoded[i] = raw[(i // shift) + cols * (i % shift)]
+    encoded_chars = []
+    for i in range(L):
+        src = (i // shift) + cols * (i % shift)
+        encoded_chars.append(message[src])
+    return "".join(encoded_chars)
 
 def scytale_decipher(message, shift):
     '''Scytale De-cipher.
@@ -197,4 +233,16 @@ def scytale_decipher(message, shift):
     '''
     # Replace `pass` with your code.
     # Stay within the function. Only use the parameters as input. The function should return your answer.
-    pass
+    if shift <= 0:
+        return message
+
+    L = len(message)
+    cols = L // shift  # same as in cipher after padding
+    # Inverse of src mapping:
+    # src(i) = (i // shift) + cols * (i % shift)
+    # For each raw index j, i = (j % cols) * shift + (j // cols)
+    decoded_chars = []
+    for j in range(L):
+        i = (j % cols) * shift + (j // cols)
+        decoded_chars.append(message[i])
+    return "".join(decoded_chars)
